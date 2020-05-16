@@ -85,8 +85,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const burgerBtn = document.getElementById('burger');
   const prevBtn = document.getElementById('prev');
   const nextBtn = document.getElementById('next');
+  const modalDialog = document.querySelector('.modal-dialog');
 
   let clientWidth = document.documentElement.clientWidth;
+  let count = -100;
+
+  modalDialog.style.top = count + '%';
+
+  const animateModal = () => {
+    modalDialog.style.top = count + '%';
+    count += 3;
+
+    if(count < 0) {
+      requestAnimationFrame(animateModal); 
+    } else {
+      count = -100;
+    }
+  };
 
   // check clientWidth
   if(clientWidth < 768) {
@@ -125,6 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   
   const openModal = () => {
+    requestAnimationFrame(animateModal);
     burgerBtn.classList.add('active');
     modalBlock.classList.add('d-block');
     document.addEventListener('click', modalClassCheck);
