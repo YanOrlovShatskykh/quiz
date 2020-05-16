@@ -3,19 +3,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const btnOpenModal = document.getElementById('btnOpenModal');
   const modalBlock = document.getElementById('modalBlock');
+  const modalWrap = document.querySelector('.modal');
   const closeModal = document.getElementById('closeModal');
   const questionTitle = document.getElementById('question');
   const formAnswers = document.getElementById('formAnswers');
   const imgPath = './image/burger.png';
   const burgName = 'Стандарт';
+  const burgerBtn = document.getElementById('burger');
 
-  btnOpenModal.addEventListener('click', () => {
-    modalBlock.classList.add('d-block');
-    closeModal.addEventListener('click', () => {
-      modalBlock.classList.remove('d-block');
-    });
-    playTest();
+  let clientWidth = document.documentElement.clientWidth;
+
+  if(clientWidth < 768) {
+    burgerBtn.style.display = 'flex';
+  } else {
+    burgerBtn.style.display = 'none';
+  }
+
+  window.addEventListener('resize', () => {
+    clientWidth = document.documentElement.clientWidth;
+
+    if(clientWidth < 768) {
+      burgerBtn.style.display = 'flex';
+    } else {
+      burgerBtn.style.display = 'none';
+    }
   });
+  
+  const modalClose = () => {    
+    modalBlock.classList.remove('d-block');
+    burgerBtn.classList.remove('active');
+    closeModal.removeEventListener('click', modalClose);   
+  };
+
+  const modalClassCheck = event => {
+    const target = event.target;
+        
+    if(!target.closest('.modal-dialog') &&
+      !target.closest('.burger') &&
+      !target.closest('#btnOpenModal')) {
+      modalClose();
+      document.removeEventListener('click', modalClassCheck);  
+    }
+    closeModal.addEventListener('click', modalClose);    
+  };
+  
+  const openModal = () => {
+    burgerBtn.classList.add('active');
+    modalBlock.classList.add('d-block');
+    document.addEventListener('click', modalClassCheck);
+    playTest();
+  };
 
   const playTest = () => {
     const renderQuestions = () => {
@@ -32,4 +69,45 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     renderQuestions();
   };
+
+  btnOpenModal.addEventListener('click', openModal);
+
+  burgerBtn.addEventListener('click', openModal);
+
+  modalWrap.addEventListener('click', closeModal);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 });
