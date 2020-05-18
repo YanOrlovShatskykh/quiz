@@ -87,6 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const nextBtn = document.getElementById('next');
   const modalDialog = document.querySelector('.modal-dialog');
   const sendBtn = document.querySelector('#send');
+  const modalTitle = document.querySelector('.modal-title');
 
   let clientWidth = document.documentElement.clientWidth;
   let count = -100;
@@ -150,6 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const playTest = () => {
     const finalAnswers = [];
+    const obj = {};
     let numberQuestion = 0;
     const renderAnswers = (index) => {  
       questions[index].answers.forEach(answer => {
@@ -167,18 +169,23 @@ document.addEventListener('DOMContentLoaded', () => {
     };    
 
     const renderQuestions = (indexQuestion) => {
-      // check buttons
+      modalTitle.textContent = 'Ответьте на вопрос:';
       formAnswers.innerHTML = '';
 
       switch(true) {
         case(numberQuestion >= 0 && numberQuestion <= questions.length - 1):
           questionTitle.textContent = `${questions[indexQuestion].question}`;
           renderAnswers(indexQuestion);
-          prevBtn.classList.remove('d-block');
-          nextBtn.classList.remove('d-block');
+          prevBtn.classList.remove('d-none');
+          nextBtn.classList.remove('d-none');
           sendBtn.classList.add('d-none');
           break;
+        case(numberQuestion === 0):
+          prevBtn.style.display = 'none';
+          break;
         case(numberQuestion === questions.length):
+          questionTitle.textContent = '';
+          modalTitle.textContent = '';
           nextBtn.classList.add('d-none');
           prevBtn.classList.add('d-none');
           sendBtn.classList.remove('d-none');
@@ -188,64 +195,39 @@ document.addEventListener('DOMContentLoaded', () => {
             <input type="tel" class="form-control" id="numberPhone">
           </div>
           `;
+          const numberPhone = document.getElementById('numberPhone');
+          numberPhone.addEventListener('input', event => {
+            event.target.value = event.target.value.replace(/[^0-9+-]/, '');
+          });  
           break;
         case(numberQuestion === questions.length + 1):
           formAnswers.textContent = 'Спасибо за пройденный тест!';
+          sendBtn.classList.add('d-none');
+          for(let key in obj) {
+            let newObj = {};
+            newObj[key] = obj[key];
+            finalAnswers.push(newObj);
+          }
+          console.log(finalAnswers);
           setTimeout(() => {
             modalBlock.classList.remove('d-block');
           }, 2000);
-        }
-      };
-
-      // if(numberQuestion >= 0 && numberQuestion <= questions.length - 1) {
-      //   questionTitle.textContent = `${questions[indexQuestion].question}`;
-      //   renderAnswers(indexQuestion);
-      //   prevBtn.classList.remove('d-block');
-      //   nextBtn.classList.remove('d-block');
-      //   sendBtn.classList.add('d-none');
-      // }
-
-      
-      !numberQuestion ? prevBtn.style.display = 'none' : prevBtn.style.display = 'inline-block';
-
-      // if(numberQuestion === questions.length) {
-      //   nextBtn.classList.add('d-none');
-      //   prevBtn.classList.add('d-none');
-      //   sendBtn.classList.remove('d-none');
-      //   formAnswers.innerHTML = `
-      //   <div class="form-group">
-      //     <label for="numberPhone">Enter your phone</label>
-      //     <input type="tel" class="form-control" id="numberPhone">
-      //   </div>
-      //   `;
-      // }
-      
-    //   if(numberQuestion === questions.length + 1) {
-    //     formAnswers.textContent = 'Спасибо за пройденный тест!';
-    //     setTimeout(() => {
-    //       modalBlock.classList.remove('d-block');
-    //     }, 2000);
-    //   }
-    // };
+      }
+    };
     renderQuestions(numberQuestion);
 
     const checkAnswer = () => {
-      const obj = {};
-
       const inputs = [...formAnswers.elements].filter((input) => input.checked || input.id === 'numberPhone');
-
       inputs.forEach((input, index) => {
+
         if(numberQuestion >= 0 && numberQuestion <= questions.length - 1) {
           obj[`${index}_${questions[numberQuestion].question}`] = input.value;
         }
 
         if(numberQuestion === questions.length) {
-          obj['Номер телефона'] =input.value
+          obj['Номер телефона'] = input.value;
         }
       });
-
-      finalAnswers.push(obj);
-      
     };
 
     nextBtn.onclick = () => {
@@ -264,7 +246,6 @@ document.addEventListener('DOMContentLoaded', () => {
       numberQuestion++;
       renderQuestions(numberQuestion);
     };
-
   };
 
   btnOpenModal.addEventListener('click', openModal);
