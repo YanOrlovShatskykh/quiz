@@ -1,81 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   'use strict';
 
-  const questions = [
-    {
-        question: "Какого цвета бургер?",
-        answers: [
-            {
-                title: 'Стандарт',
-                url: './image/burger.png'
-            },
-            {
-                title: 'Черный',
-                url: './image/burgerBlack.png'
-            }
-        ],
-        type: 'radio'
-    },
-    {
-        question: "Из какого мяса котлета?",
-        answers: [
-            {
-                title: 'Курица',
-                url: './image/chickenMeat.png'
-            },
-            {
-                title: 'Говядина',
-                url: './image/beefMeat.png'
-            },
-            {
-                title: 'Свинина',
-                url: './image/porkMeat.png'
-            }
-        ],
-        type: 'radio'
-    },
-    {
-        question: "Дополнительные ингредиенты?",
-        answers: [
-            {
-                title: 'Помидор',
-                url: './image/tomato.png'
-            },
-            {
-                title: 'Огурец',
-                url: './image/cucumber.png'
-            },
-            {
-                title: 'Салат',
-                url: './image/salad.png'
-            },
-            {
-                title: 'Лук',
-                url: './image/onion.png'
-            }
-        ],
-        type: 'checkbox'
-    },
-    {
-        question: "Добавить соус?",
-        answers: [
-            {
-                title: 'Чесночный',
-                url: './image/sauce1.png'
-            },
-            {
-                title: 'Томатный',
-                url: './image/sauce2.png'
-            },
-            {
-                title: 'Горчичный',
-                url: './image/sauce3.png'
-            }
-        ],
-        type: 'radio'
-    }
-];
-
   const btnOpenModal = document.getElementById('btnOpenModal');
   const modalBlock = document.getElementById('modalBlock');
   const modalWrap = document.querySelector('.modal');
@@ -91,6 +16,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let clientWidth = document.documentElement.clientWidth;
   let count = -100;
+
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyBe4VE1LCXDfXXLpncZ4QM5PGwqlCBxV0Y",
+    authDomain: "testburger-6ba96.firebaseapp.com",
+    databaseURL: "https://testburger-6ba96.firebaseio.com",
+    projectId: "testburger-6ba96",
+    storageBucket: "testburger-6ba96.appspot.com",
+    messagingSenderId: "389660030922",
+    appId: "1:389660030922:web:cb592e8cf6ac9a5eea0133",
+    measurementId: "G-T67QG9J1S5"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+
+  const getData = () => {
+    formAnswers.textContent = 'LOAD';
+    firebase.database().ref().child('questions').once('value')
+      .then(snap => playTest(snap.val()));
+  };
 
   modalDialog.style.top = count + '%';
 
@@ -146,10 +91,10 @@ document.addEventListener('DOMContentLoaded', () => {
     burgerBtn.classList.add('active');
     modalBlock.classList.add('d-block');
     document.addEventListener('click', modalClassCheck);
-    playTest();
+    getData();
   };
 
-  const playTest = () => {
+  const playTest = (questions) => {
     const finalAnswers = [];
     const obj = {};
     let numberQuestion = 0;
@@ -208,7 +153,6 @@ document.addEventListener('DOMContentLoaded', () => {
             newObj[key] = obj[key];
             finalAnswers.push(newObj);
           }
-          console.log(finalAnswers);
           setTimeout(() => {
             modalBlock.classList.remove('d-block');
           }, 2000);
@@ -245,6 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
       checkAnswer();
       numberQuestion++;
       renderQuestions(numberQuestion);
+      firebase.database().ref().child('contacts').push(finalAnswers)
     };
   };
 
